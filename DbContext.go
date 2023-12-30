@@ -1,6 +1,8 @@
-package src
+package main
 
-import "reflect"
+import (
+	"reflect"
+)
 
 type DbContext struct {
 	tables []DbTable
@@ -12,7 +14,7 @@ func CreateDbContext() DbContext {
 	}
 }
 
-func RegisterTable[T any](ctx DbContext, entity T) {
+func (ctx DbContext) RegisterTable(entity any) {
 	tableName := reflect.TypeOf(entity).Name()
 	ctx.tables = append(ctx.tables, DbTable{
 		tableName: tableName,

@@ -1,6 +1,6 @@
-package src
+package main
 
 type DbTable struct {
 	tableName string
-	columns   DbColumn
+	columns   []DbColumn
 }
