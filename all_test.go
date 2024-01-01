@@ -8,7 +8,7 @@ import (
 func TestAll(t *testing.T) {
 	ctx := CreateDbContext()
 	ctx.RegisterTable(entities.User{})
-	ctx.Table(entities.User{}).Add(entities.User{
+	ctx.Add(entities.User{
 		Id:        0,
 		FirstName: "Feroz",
 		LastName:  "Ahmmed",
