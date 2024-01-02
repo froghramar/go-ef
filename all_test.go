@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/stretchr/testify/assert"
 	"go-ef/entities"
 	"testing"
 )
@@ -14,4 +15,6 @@ func TestAll(t *testing.T) {
 		LastName:  "Ahmmed",
 		Age:       29,
 	})
+	query := ctx.BuildQuery()
+	assert.Equal(t, "INSERT INTO User (FirstName, LastName, Age) VALUES ('Feroz', 'Ahmmed', 29)", query)
 }

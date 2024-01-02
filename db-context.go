@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/thoas/go-funk"
+	"log"
 	"reflect"
+	"strings"
 )
 
 type DbContext struct {
@@ -34,4 +37,31 @@ func (ctx *DbContext) Add(entity any) {
 
 	typedTable := table.(DbTable)
 	typedTable.records = append(typedTable.records, entity)
+}
+
+func (ctx *DbContext) BuildQuery() string {
+	var sb strings.Builder
+	for _, table := range ctx.tables {
+		if len(table.records) == 0 {
+			continue
+		}
+		query := generateQuery(table)
+		sb.WriteString(query)
+	}
+	return sb.String()
+}
+
+func (ctx *DbContext) Save() {
+	query := ctx.BuildQuery()
+	log.Println(query)
+}
+
+func generateQuery(table DbTable) string {
+	if len(table.records) == 0 {
+		panic("No records")
+	}
+
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("INSERT INTO %s", table.tableName))
+	return sb.String()
 }
