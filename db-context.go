@@ -27,16 +27,15 @@ func (ctx *DbContext) RegisterTable(entity any) {
 
 func (ctx *DbContext) Add(entity any) {
 	tableName := reflect.TypeOf(entity).Name()
-	table := funk.Find(ctx.tables, func(table DbTable) bool {
+	tableIndex := funk.IndexOf(ctx.tables, func(table DbTable) bool {
 		return table.tableName == tableName
 	})
 
-	if table == nil {
+	if tableIndex == -1 {
 		panic("Table not found")
 	}
 
-	typedTable := table.(DbTable)
-	typedTable.records = append(typedTable.records, entity)
+	ctx.tables[tableIndex].records = append(ctx.tables[tableIndex].records, entity)
 }
 
 func (ctx *DbContext) BuildQuery() string {
