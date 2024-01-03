@@ -10,11 +10,11 @@ func TestAll(t *testing.T) {
 	ctx := CreateDbContext()
 	ctx.RegisterTable(entities.User{})
 	ctx.Add(entities.User{
-		Id:        0,
+		Id:        1,
 		FirstName: "Feroz",
 		LastName:  "Ahmmed",
 		Age:       29,
 	})
 	query := ctx.BuildQuery()
-	assert.Equal(t, "INSERT INTO User (FirstName, LastName, Age) VALUES ('Feroz', 'Ahmmed', 29);", query)
+	assert.Equal(t, "INSERT INTO User (Id, FirstName, LastName, Age) VALUES (1, 'Feroz', 'Ahmmed', 29);", query)
 }
