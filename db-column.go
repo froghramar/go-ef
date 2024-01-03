@@ -9,4 +9,5 @@ type DbColumnType string
 
 const (
 	Integer DbColumnType = "int"
+	String  DbColumnType = "string"
 )

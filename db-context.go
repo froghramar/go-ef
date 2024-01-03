@@ -24,8 +24,9 @@ func (ctx *DbContext) RegisterTable(entity any) {
 	tableName := tableType.Name()
 	columns := make([]DbColumn, 0)
 	for i := 0; i < tableType.NumField(); i++ {
-		var column = tableType.Field(i)
-		columns = append(columns, DbColumn{name: column.Name})
+		column := tableType.Field(i)
+		columnType := getDbColumnType(column.Type)
+		columns = append(columns, DbColumn{name: column.Name, columnType: columnType})
 	}
 	ctx.tables = append(ctx.tables, DbTable{
 		tableName: tableName,
@@ -72,6 +73,37 @@ func generateQuery(table DbTable) string {
 	commaSeparatedColumnNames := strings.Join(columnNames[:], ", ")
 
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("INSERT INTO %s (%s)", table.tableName, commaSeparatedColumnNames))
-	return sb.String()
+	for _, record := range table.records {
+		structVal := reflect.ValueOf(record)
+		values := utils.Select(table.columns, func(column DbColumn) string {
+			fieldVal := structVal.FieldByName(column.name)
+			return addQuotesIfNecessary(fmt.Sprint(fieldVal.Interface()), column.columnType)
+		})
+		sb.WriteString(fmt.Sprintf("(%s)", strings.Join(values, ", ")))
+	}
+
+	return fmt.Sprintf("INSERT INTO %s (%s) VALUES %s;", table.tableName, commaSeparatedColumnNames, sb.String())
+}
+
+func addQuotesIfNecessary(value string, columnType DbColumnType) string {
+	if columnType == String {
+		return addQuotes(value)
+	}
+
+	return value
+}
+
+func addQuotes(value string) string {
+	return fmt.Sprintf("'%s'", value)
+}
+
+func getDbColumnType(columnType reflect.Type) DbColumnType {
+	switch columnType.Kind() {
+	default:
+		panic("Unrecognized column type")
+	case reflect.Int:
+		return Integer
+	case reflect.String:
+		return String
+	}
 }

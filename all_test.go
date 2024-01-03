@@ -16,5 +16,5 @@ func TestAll(t *testing.T) {
 		Age:       29,
 	})
 	query := ctx.BuildQuery()
-	assert.Equal(t, "INSERT INTO User (FirstName, LastName, Age) VALUES ('Feroz', 'Ahmmed', 29)", query)
+	assert.Equal(t, "INSERT INTO User (FirstName, LastName, Age) VALUES ('Feroz', 'Ahmmed', 29);", query)
 }
