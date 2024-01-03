@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/thoas/go-funk"
+	"go-ef/utils"
 	"log"
 	"reflect"
 	"strings"
@@ -19,9 +20,16 @@ func CreateDbContext() DbContext {
 }
 
 func (ctx *DbContext) RegisterTable(entity any) {
-	tableName := reflect.TypeOf(entity).Name()
+	tableType := reflect.TypeOf(entity)
+	tableName := tableType.Name()
+	columns := make([]DbColumn, 0)
+	for i := 0; i < tableType.NumField(); i++ {
+		var column = tableType.Field(i)
+		columns = append(columns, DbColumn{name: column.Name})
+	}
 	ctx.tables = append(ctx.tables, DbTable{
 		tableName: tableName,
+		columns:   columns,
 	})
 }
 
@@ -60,7 +68,10 @@ func generateQuery(table DbTable) string {
 		panic("No records")
 	}
 
+	columnNames := utils.Select(table.columns, func(column DbColumn) string { return column.name })
+	commaSeparatedColumnNames := strings.Join(columnNames[:], ", ")
+
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("INSERT INTO %s", table.tableName))
+	sb.WriteString(fmt.Sprintf("INSERT INTO %s (%s)", table.tableName, commaSeparatedColumnNames))
 	return sb.String()
 }
